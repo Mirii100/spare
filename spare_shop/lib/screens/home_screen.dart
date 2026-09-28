@@ -4,6 +4,7 @@ import 'package:spares_app/services/local_storage.dart';
 import 'package:spares_app/services/voice_service.dart';
 import 'sale_screen.dart';
 import 'statement_screen.dart';
+import 'dashboard_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late LocalStorage _storage;
   late VoiceService _voice;
   List<Product> _products = [];
+  List<Product> _lowStockProducts = [];
   Customer? _customer;
   double _todaySales = 0;
   int _syncBadge = 0;
@@ -30,9 +32,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     final products = await _storage.getProducts();
-    setState(() => _products = products);
+    setState(() {
+      _products = products;
+      _lowStockProducts = products.where((p) => p.quantity <= p.minStock).toList();
+    });
     final custs = await _storage.getCustomers();
     setState(() => _customer = custs.isNotEmpty ? custs.first : null);
+    _syncBadge = _storage.getSyncCount();
+    setState(() {});
   }
 
   void _startVoice() async {
@@ -82,44 +89,37 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Spare Shop')),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Today sales: KSh $_todaySales', style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.voice_off),
-              label: const Text('Voice Sale Entry'),
-              onPressed: _startVoice,
-            ),
-            const SizedBox(height: 24),
-            const Text('Quick actions:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _navigateToSale(Sale(
-                    id: DateTime.now().millisecondsSinceEpoch,
-                    date: DateTime.now(),
-                    customer: _customer ?? Customer(id: 0, name: ''),
-                    lines: [],
-                    payments: {},
-                    profit: 0,
-                  )),
-                  child: const Text('Sell'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StatementScreen()))),
-                  child: const Text('Statement'),
-                ),
-              ],
-            ),
-          ],
-        ),
+      appBar: AppBar(
+        title: const Text('Spare Shop'),
+        actions: [
+          IconButton(
+            icon: Icon(_syncBadge > 0 ? Icons.cloud_download : Icons.cloud_off),
+            tooltip: _syncBadge > 0 ? '$_syncBadge pending sync' : null,
+            onPressed: () {
+              // could navigate to sync view
+            },
+          ),
+        ],
       ),
+      body: _lowStockProducts.isNotEmpty
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    color: Colors.red.shade100,
+                    child: Text(
+                      'Low stock: ${_lowStockProducts.map((p) => p.name).join(', ')}',
+                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildBody(),
+                ],
+              ),
+            )
+          : _buildBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _startVoice,
         tooltip: 'Voice entry',
@@ -130,11 +130,54 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Sales'),
           BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Statement'),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
         ],
         currentIndex: 0,
         onTap: (idx) {
-          // simple navigation placeholder
+          if (idx == 3) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
+          }
         },
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Today sales: KSh $_todaySales', style: const TextStyle(fontSize: 18)),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.voice_off),
+            label: const Text('Voice Sale Entry'),
+            onPressed: _startVoice,
+          ),
+          const SizedBox(height: 24),
+          const Text('Quick actions:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () => _navigateToSale(Sale(
+                  id: DateTime.now().millisecondsSinceEpoch,
+                  date: DateTime.now(),
+                  customer: _customer ?? Customer(id: 0, name: ''),
+                  lines: [],
+                  payments: {},
+                  profit: 0,
+                )),
+                child: const Text('Sell'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const StatementScreen()))),
+                child: const Text('Statement'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

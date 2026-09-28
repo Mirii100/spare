@@ -44,7 +44,8 @@ class LocalStorage {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL,
         customer_id INTEGER,
-        profit REAL NOT NULL DEFAULT 0
+        profit REAL NOT NULL DEFAULT 0,
+        synced INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -76,6 +77,15 @@ class LocalStorage {
         reason TEXT,
         date TEXT NOT NULL,
         user TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE pending_sync (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        record_id INTEGER NOT NULL,
+        table_name TEXT NOT NULL,
+        synced INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -124,6 +134,14 @@ class LocalStorage {
       'date': s.date.toIso8601String(),
       'customer_id': s.customer.id,
       'profit': profit,
+      'synced': 0,
+    });
+
+    // Record pending sync entry
+    await db.insert('pending_sync', {
+      'record_id': id,
+      'table_name': 'sales',
+      'synced': 0,
     });
 
     for (final line in s.lines) {
@@ -160,6 +178,11 @@ class LocalStorage {
     )).toList();
   }
 
+  Future<List<Map<String, dynamic>>> getSalesRecords() async {
+    final List<Map<String, dynamic>> maps = await _db!.query('sales');
+    return maps;
+  }
+
   Future<void> upsertCustomer(Customer c) async {
     final db = await initDb();
     await db.insert('customers', {
@@ -182,6 +205,15 @@ class LocalStorage {
 
   Future<void> markSynced(int recordId, String table) async {
     final db = await initDb();
+    // Mark the record synced in its own table
     await db.rawUpdate('UPDATE $table SET synced = 1 WHERE id = ?', [recordId]);
+    // Also mark pending_sync entry if exists
+    await db.rawUpdate('UPDATE pending_sync SET synced = 1 WHERE record_id = ? AND table_name = ?', [recordId, table]);
+  }
+
+  Future<int> getSyncCount() async {
+    final db = await initDb();
+    final List<Map<String, dynamic>> maps = await db.query('pending_sync', where: 'synced = 0');
+    return maps.length;
   }
 }
