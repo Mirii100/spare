@@ -5,6 +5,7 @@ import 'package:spares_app/services/voice_service.dart';
 import 'sale_screen.dart';
 import 'statement_screen.dart';
 import 'dashboard_screen.dart';
+import 'auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -97,6 +98,19 @@ class _HomeScreenState extends State<HomeScreen> {
             tooltip: _syncBadge > 0 ? '$_syncBadge pending sync' : null,
             onPressed: () {
               // could navigate to sync view
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Log out',
+            onPressed: () async {
+              await AuthService.logout();
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('You have been logged out')),
+              );
+              // Optionally navigate back to login; for demo we just show the message.
+              // The next app launch will show the login screen.
             },
           ),
         ],

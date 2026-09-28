@@ -13,6 +13,7 @@ dependencies:
   speech_to_text: ^6.0.0
   permission_handler: ^10.4.0
   intl: ^0.18.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:
