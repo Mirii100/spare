@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spares shop app: design</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E8EAED;--ink:#1B1F24;--mut:#5A626C;--card:#fff;--line:#C9CED4;--yel:#F2C200;--grn:#1F7A4D;--red:#B3261E;--amb:#8A5A00;--ambbg:#FFF1CC}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 Barlow,system-ui,sans-serif;padding:24px 16px 48px}
+main{max-width:1000px;margin:0 auto}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-weight:600;line-height:1.1;margin:0}
+h1{font-size:44px;margin-bottom:8px}
+h2{font-size:28px;margin:44px 0 12px}
+h3{font-size:20px;margin-bottom:6px}
+p{margin:0 0 12px;max-width:68ch}
+.lead{font-size:18px;color:var(--mut)}
+.phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-top:20px}
+.ph{background:var(--card);border:2px solid var(--ink);border-radius:26px;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:14px;min-height:520px}
+.cap{text-align:center;color:var(--mut);font-size:14px;margin:8px 0 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mut{color:var(--mut);font-size:13px}
+.box{background:var(--bg);border-radius:10px;padding:10px}
+.big{min-height:52px;border-radius:12px;border:2px solid var(--ink);background:#fff;font:500 15px Barlow,sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;cursor:pointer}
+.big:focus-visible,.mic:focus-visible{outline:3px solid var(--grn);outline-offset:2px}
+.go{background:var(--yel)}
+.pill{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--ambbg);color:var(--amb)}
+.mic{width:84px;height:84px;border-radius:50%;border:none;background:var(--yel);color:var(--ink);font:600 15px "Barlow Condensed",sans-serif;cursor:pointer;box-shadow:0 0 0 4px var(--ink) inset}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.low{background:#FBE3E1;color:var(--red);border-radius:10px;padding:9px 12px;font-size:13px}
+.st{display:flex;gap:6px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}
+.st span:nth-child(1){width:46px;color:var(--mut)}
+.st span:nth-child(2){flex:1}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px}
+ul{margin:0;padding-left:20px}
+li{margin-bottom:6px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+th{font-weight:500;color:var(--mut);border-top:none}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 16px}
+.flow span{background:var(--card);border:2px solid var(--ink);border-radius:8px;padding:6px 12px;font-weight:500}
+.flow b{font-weight:400;color:var(--mut)}
+#toast{margin-top:10px;font-size:13px;color:var(--grn);min-height:20px}
+</style>
+</head>
+<body>
+<main>
+<h1>Spares shop app: design</h1>
+<p class="lead">Voice-first, offline-first sales, stock, credit, and profit control for an auto-spares shop. This is the design for review. The screens below respond to taps, so you can try the flow.</p>
+
+<h2>Core screens</h2>
+<div class="phones">
+
+<section>
+<div class="ph">
+<div class="row"><strong>Kamau spares</strong><span class="pill" id="sync">7 waiting to sync</span></div>
+<div class="box"><div class="mut">Today's sales</div><div style="font:600 30px 'Barlow Condensed',sans-serif">KSh 86,400</div>
+<div class="row mut" style="margin-top:4px"><span>Cash 31.5k</span><span>M-Pesa 44.9k</span><span>Credit 10k</span></div></div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0">
+<button class="mic" id="mic" aria-label="Start voice entry">Speak</button>
+<span class="mut" id="micnote">Tap and say the sale</span></div>
+<div class="grid2">
+<button class="big">Sell</button><button class="big">Stock in</button>
+<button class="big">Payment</button><button class="big">Scan part</button></div>
+<div class="low">Low stock: Fielder brake pads (3 left, minimum 5)</div>
+</div>
+<p class="cap">Home</p></section>
+
+<section>
+<div class="ph">
+<div class="row"><strong>Confirm sale</strong><span class="mut">Voice</span></div>
+<div class="box mut" style="font-style:italic">"Kamau took two Fielder brake pads at 4,500 each on credit"</div>
+<div class="box" style="display:flex;flex-direction:column;gap:6px">
+<div class="row"><span class="mut">Customer</span><strong>Kamau Auto Garage</strong></div>
+<div class="row"><span class="mut">Vehicle</span><span>Fielder KDA 123A</span></div>
+<div class="row"><span class="mut">Item</span><span>Brake pad, Fielder x2</span></div>
+<div class="row"><span class="mut">Price</span><span>4,500 each</span></div>
+<div class="row" style="border-top:1px solid var(--line);padding-top:6px"><span class="mut">Total</span><span style="font:600 26px 'Barlow Condensed',sans-serif">9,000</span></div>
+<div class="row"><span class="mut">Paid / credit</span><span style="color:var(--amb)">0 / 9,000</span></div></div>
+<div class="row mut"><span>Stock 20 to 18</span><span>Profit 2,600</span></div>
+<div style="display:grid;grid-template-columns:1fr 2fr;gap:8px">
+<button class="big">Edit</button><button class="big go" id="confirm">Confirm sale</button></div>
+<div id="toast" role="status"></div>
+</div>
+<p class="cap">Voice sale review</p></section>
+
+<section>
+<div class="ph">
+<div class="row"><strong>Statement</strong><span class="mut">Kamau Auto Garage</span></div>
+<div class="box"><div class="mut">Owes you</div><div style="font:600 32px 'Barlow Condensed',sans-serif;color:var(--red)" id="bal">KSh 34,500</div></div>
+<div>
+<div class="st mut"><span>Date</span><span>Item</span><span>Balance</span></div>
+<div class="st"><span>01 Aug</span><span>Brake pads +9,000</span><span>9,000</span></div>
+<div class="st"><span>03 Aug</span><span>Oil filters +4,000</span><span>13,000</span></div>
+<div class="st"><span>05 Aug</span><span style="color:var(--grn)">M-Pesa -10,000</span><span>3,000</span></div>
+<div class="st"><span>07 Aug</span><span>Shock absorber +8,000</span><span>11,000</span></div></div>
+<div class="grid2" style="margin-top:auto">
+<button class="big go" id="pay">Record payment</button><button class="big">Send on WhatsApp</button></div>
+</div>
+<p class="cap">Mechanic statement</p></section>
+</div>
+
+<h2>How it works</h2>
+<div class="cols">
+<div><h3>Rules the app follows</h3>
+<ul>
+<li>Every action saves to the phone first, so nothing is lost when the signal drops or the phone restarts.</li>
+<li>Nothing is edited in place. Sales, payments, returns, receipts, and adjustments are added as new records.</li>
+<li>Stock and balances are calculated from those records, so you can see why stock is 48.</li>
+<li>Each record has a unique ID made on the phone. The server ignores repeats, so one offline sale is exactly one sale.</li>
+<li>Voice only fills in the confirm screen. You always review before saving.</li></ul></div>
+<div><h3>Sale flow</h3>
+<div class="flow"><span>Speak</span><b>then</b><span>Review</span><b>then</b><span>Confirm</span><b>then</b><span>Done</span></div>
+<p>On confirm, the sale creates stock movements (-), updates the customer ledger, records payments by method, and stores cost and price for profit.</p>
+<div class="flow"><span>Phone database</span><b>then</b><span>Sync queue</span><b>then</b><span>Cloud</span></div>
+<p>The sync queue retries until the server confirms. The badge shows "All data synchronized" or "7 waiting to sync".</p></div>
+</div>
+
+<h2>Data</h2>
+<table>
+<tr><th>Group</th><th>Holds</th></tr>
+<tr><td>Products</td><td>Part name and number, cross-references, vehicle fit, brand, supplier, cost, price, minimum stock, shelf, barcode</td></tr>
+<tr><td>Stock movements</td><td>Opening, purchase, sale, return, damaged, lost, correction, each with a reason, user, and time</td></tr>
+<tr><td>Customers</td><td>Mechanics and garages, their vehicles and registrations, and a ledger of debits and credits</td></tr>
+<tr><td>Sales</td><td>Sale, items, cost and price at time of sale, payments split by cash, M-Pesa, bank, card, and credit, with references</td></tr>
+<tr><td>Suppliers</td><td>Contacts, purchases, amounts owed, payments, and price history per part</td></tr>
+<tr><td>Access</td><td>Owner, Salesperson, and Storekeeper roles, devices, and an audit log of who did what and when</td></tr>
+</table>
+
+<h2>Proposed stack</h2>
+<ul>
+<li>App: installable web app (PWA) or React Native, with a local SQLite database and sync queue</li>
+<li>Voice: on-device speech recognition for mixed Swahili and English, then a parser for customer, item, quantity, price, and payment</li>
+<li>Server: Postgres (for example Supabase) with role-based permissions and automatic daily backups</li>
+</ul>
+
+<h2>Build order</h2>
+<table>
+<tr><th>Phase</th><th>Delivers</th></tr>
+<tr><td>1</td><td>Products, sales, credit, mechanic accounts, offline storage and sync</td></tr>
+<tr><td>2</td><td>Voice entry, payments and references, statements</td></tr>
+<tr><td>3</td><td>Stock receiving, returns, adjustments, low-stock alerts</td></tr>
+<tr><td>4</td><td>Suppliers, purchases, daily summary, profit reports</td></tr>
+<tr><td>5</td><td>Barcode scanning, cash reconciliation, roles, audit views</td></tr>
+</table>
+</main>
+
+<script>
+var mic=document.getElementById('mic'),note=document.getElementById('micnote');
+mic.addEventListener('click',function(){
+  note.textContent='Listening…';
+  setTimeout(function(){note.textContent='Heard it. Check the confirm screen.'},1400);
+});
+document.getElementById('confirm').addEventListener('click',function(){
+  document.getElementById('toast').textContent='Saved on phone. Sync pending.';
+  document.getElementById('sync').textContent='8 waiting to sync';
+});
+document.getElementById('pay').addEventListener('click',function(){
+  document.getElementById('bal').textContent='KSh 24,500';
+});
+</script>
+</body>
+</html>
